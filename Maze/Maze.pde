@@ -3,7 +3,7 @@ import java.util.*;
 final int W=0, S=1, G=2, L=3;
 final color CellColor[] = {color(150,150,150), color(0,0,150),
                            color(150,0,0),  color(0,0,0) };
-final String[] CellName = {"Wall", "Start", "Goal", "Load"};
+final String[] CellName = {"Wall", "Start", "Goal", "Road"};
 final int MAPSIZE = 400, miniMAPISZE = MAPSIZE/5;
 final int left=50,top=50;
 final int[] dx = {0, -1, 0, 1, 0};
