@@ -1,5 +1,4 @@
-// WS sample program by Hajime Nobuhara 
-//
+
 
 int W_size = 400; // screen size 
 int N = 50; // Node number 

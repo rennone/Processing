@@ -1,7 +1,5 @@
-//森林火災シミュレータ「めぐみさん」
-//Hajime Nobuhara  
-//サイト過程を利用
-int sx, sy; //2次元セルを管理する縦と横の長さ
+
+int sx, sy; 
 float density = 65; //木の存在確率 
 float moe = 100; //
 int[][][] world; //各セルを管理する配列
