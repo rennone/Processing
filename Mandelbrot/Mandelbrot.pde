@@ -1,84 +1,95 @@
-float objX, objY;    //オブジェクトのx, y座標
-float disX, disY;    //mouse座標とオブジェクトの距離
-float tempX, tempY;    //mouseが押されたときに、一時的にx, y座標を保存しておくための変数
-float delay = 2.0;    //マウスに遅れる度合い
-/*
-float a = -0.51;
-float b = 0.6130209;
-float w = 0.00001;
-*/
-int h;
-float a = 0.0;
-float b = 0.0;
-float w = 1.0;
+float a = -0.5; //座標x方向の移動量 
+float b = 0.0;  //座標y方向の移動量
+float scale = 1.8; //倍率の設定
+
+PImage image;
+
 void setup(){
-  size(400,400);
-  colorMode(RGB,512);
-  //colorMode(HSB); //HSB色空間にセット
-  background(0);
-  h = width / 2;
+  size(400,400); //400x400画素の描画窓を作成
+  colorMode(RGB); //RGB色空間にセット
+  background(0); //背景は黒にセット
+  
+  image = createImage(width, height, RGB);
+  
+  noLoop();
 }
 
-void draw(){
-  
-  int n = 1024;
-  //n = 50;
-  int c;
-  
-  int i,j,l,cc;
-  float x, y, zx, zy, u, v, mx;
-  
-  for(i=-h; i<=h; i++){
-      u = (w * i / h) + a;
-      for(j=-h; j<=h; j++){
-        v = (w * j / h) + b;
-        
-        x = 0.0;
-        y = 0.0;
-        
-        for(l=1; l<=n; l++){
-          zx = x * x - y * y + u;
-          zy = 2 * x * y     + v;
-          x = zx;
-          y = zy;
-          mx = x * x + y * y;
-          if (mx >= 10.0){
-            break;
-          }
-        }
-          c = int (512 * l / n);
-          stroke(c * 2, c + 100 , c + 100 );
-          //c = int(256*l/n);
-          //stroke(c, 256, 256);
-          point(200+i, 200-j);
-        
-      }
+int calc(float x0, float y0){
+  float x=0.0, y=0.0;
+  int iteration = 0;
+  int max_iteration = 300;
+  float sqrLimit = 10;
+  while( x*x + y*y < sqrLimit && iteration < max_iteration){
+    float xTmp = x*x - y*y + x0;
+    y = 2*x*y + y0;
+    x = xTmp;
+    iteration+=1;
   }
+  
+  return int (255 * iteration / max_iteration); 
 }
 
-void mousePressed() {
-  tempX = mouseX;
-  tempY = mouseY;
+void update()
+{
+  image.loadPixels();
+  float dx = scale/image.width;
+  float dy = scale/image.height;
+  
+  for(int i=0; i<image.width; i++){
+    float x0 = -scale*0.5 + i*dx + a;
+    for(int j=0; j<image.height; j++){
+      float y0 = -scale*0.5 + j*dy + b;
+      int c = calc(x0, y0);
+      image.pixels[j*image.width+i] = color(c);
+    }
+  }
+  
+  image.updatePixels();
+
 }
 
-void mouseReleased(){
-  tempX = mouseX - 200;
-  tempY = -mouseY + 200;
-  float _x = w*tempX/h + a;
-  float _y = w*tempY/h + b;
-  // println("a = " + _x + " b= " + _y);
-   
-  a = _x;
-  b = _y;
-  println("a = " + a+ " b= " + b + " w= " + w);
+//描画部
+void draw(){
+  background(0);
+  update();
+  image(image, 0, 0, width, height);
+  
+  fill(255,255,255);    
+  text("up,down,right,left : moving", 1,20);
+  text("               z,x : zooming", 1, 35);
 }
 
-void keyPressed(){
-  if(keyCode == UP) {  //上に動く
-      w*=2.0;
-   }else if (keyCode == DOWN) {    //下に動く
-      w/=2.0;
-   }
-  println("a = " + a+ " b= " + b + " w= " + w);
+void keyPressed()
+{
+  float speed = 0.1 * scale;
+  if(key == CODED){
+    switch(keyCode){
+      case UP:
+        b -= speed;
+        break;
+      case DOWN:
+        b += speed;
+        break;
+      case RIGHT:
+        a += speed;
+        break;
+      case LEFT:
+        a -= speed;
+        break;
+    }
+  }
+  
+  float zoomSpeed = 0.3; // 0~1.0の間
+  switch(key)
+  {
+    case 'z':
+      scale *= (1-zoomSpeed);      
+      break;
+    case 'x':
+      scale *= (1+zoomSpeed);
+      break;  
+  }
+  
+  redraw();
 }
 
